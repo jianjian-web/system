@@ -1,13 +1,36 @@
 <template>
   <div class='HomePage'>
-    <p class='title'>电力变压器在线故障检测系统</p>
+    <!-- <p class='title'>电力变压器在线故障检测系统</p> -->
     <p class='list'>
-      <span>文本(F)</span>
+      <span>
+        文本(F)
+      </span>
       <span>编辑(E)</span>
       <span>查看(V)</span>
       <span>帮助(H)</span>
-      <span>图像处理(D)</span>
-      <span>图像统计(S)</span>
+      <span>
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link">
+            图像处理(D)
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>线性变换</el-dropdown-item>
+            <el-dropdown-item>阙值变换</el-dropdown-item>
+            <el-dropdown-item>灰度拉伸</el-dropdown-item>
+            <el-dropdown-item>中值滤波</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </span>
+      <span>
+        <el-dropdown trigger="click">
+          <span class="el-dropdown-link">
+            图像统计(S)
+          </span>
+          <el-dropdown-menu slot="dropdown">
+            <el-dropdown-item>绘制直方图</el-dropdown-item>
+          </el-dropdown-menu>
+        </el-dropdown>
+      </span>
     </p>
     <p class='banner'>
       电力变压器在线故障检测系统
@@ -27,22 +50,38 @@
             </p>
           </div>
         </div>
-        <p class='item'>系统设置</p>
-        <p class='item'>检测设置</p>
+        <p class='item' @click='system = true'>系统设置</p>
+        <p class='item' @click='monitor = true'>检测设置</p>
         <p class='item'>历史数据查询</p>
-        <p class='item'>报警记录</p>
+        <p class='item' @click='danger = true'>报警记录</p>
         <p class='item'>故障分析报告</p>
         <div class='item' style='position: relative;'>图像采集周期
           <p class='item-right'>
-            <span>|</span><span class='item-time'>分钟</span><span class='icon-arrow'></span>
+            <el-select v-model="selectValue" placeholder="请选择" style='border:none;padding:0;'>
+              <el-option label="1分钟" value="1分钟"></el-option>
+              <el-option label="5分钟" value="5分钟"></el-option>
+              <el-option label="10分钟" value="10分钟"></el-option>
+              <el-option label="30分钟" value="30分钟"></el-option>
+              <el-option label="1小时" value="1小时"></el-option>
+            </el-select>
           </p>
         </div>
         <p class='item'>基准热图选择</p>
       </div>
       <div class='right'>
         <div class='img-wrapper'>
-          <img src="../assets/1.jpg" alt="" style='margin-right:145px;'>
-          <img src="../assets/2.jpg" alt="">
+          <div>
+            <img src="../assets/img.jpg" alt="" style='width:410px;margin-right:10px;'>
+            <span>
+              当前热图
+            </span>
+          </div>
+          <div>
+            <img src="../assets/img.jpg" alt="" style='width:410px;'>
+            <span>
+              基准热图
+            </span>
+          </div>
         </div>
         <p class='table-title'>检测区数据显示</p>
         <p style='text-align:right'>当前日期：{{new Date().getFullYear()}}年{{new Date().getMonth()+1}}月{{new Date().getDate()}}日</p>
@@ -82,19 +121,19 @@
         <p class='table-title' style='margin-top:29px;'>系统状态</p>
         <div class='light-wrapper'>
           <div class='light-group'>
-            <span class='icon-chachepanzhishideng light' style='color:#97E304;'></span>
+            <span class='myicon-chachepanzhishideng light' style='color:#97E304;'></span>
             系统状态
           </div>
           <div class='light-group'>
-            <span class='icon-chachepanzhishideng light' style='color:#97E304;'></span>
+            <span class='myicon-chachepanzhishideng light' style='color:#97E304;'></span>
             自动检测
           </div>
           <div class='light-group'>
-            <span class='icon-chachepanzhishideng light' style='color:#97E304;'></span>
+            <span class='myicon-chachepanzhishideng light' style='color:#97E304;'></span>
             热像仪连接
           </div>
           <div class='light-group'>
-            <span class='icon-chachepanzhishideng light' style='color:red;'></span>
+            <span class='myicon-chachepanzhishideng light' style='color:red;'></span>
             报警
           </div>
           <div class='tip'>
@@ -104,6 +143,124 @@
         </div>
       </div>
     </div>
+    <el-dialog
+      :visible.sync="system"
+      width="645px"
+      >
+      <div class='system-body'>
+        <p class='dialog-title'>系统设置</p>
+        <div class='dialog-content'>
+          <div class='tree-menu'>
+            <el-tree :data="data" :props="defaultProps" :default-expanded-keys="[1]" node-key="id"></el-tree>
+          </div>
+          <div class='dialog-setting'>
+            <p>报警温度设置</p>
+            <p class='btn-group'>
+              <span :class='{active: current === 0}' @click='current = 0'>
+                A (变压器箱体) 
+              </span>
+              <span :class='{active: current === 1}' @click='current = 1'>
+                B (油枕) 
+              </span>
+              <span :class='{active: current === 2}' @click='current = 2'>
+                C (套管) 
+              </span>
+            </p>
+            <div class='input-group'>
+               <p>绝对温度判断报警法</p>
+               <p>
+                 <label>请输入正常工作时的最高温度</label><input value='60' type="text" style='float:right;padding:5px;width:160px;border:none;background:#F8F8F8;'>
+               </p>
+               <p>
+                 <label>请输入产生严重故障的最低温度</label><input value='75' type="text" style='float:right;padding:5px;width:160px;border:none;background:#F8F8F8;'>
+               </p>
+            </div>
+            <div class='input-group' style='height:145px;'>
+               <p>相对温度判断报警法</p>
+               <p>
+                 <label>请输入正常工作时的温度</label><input value='50' type="text" style='float:right;padding:5px;width:160px;border:none;background:#F8F8F8;'>
+               </p>
+               <p>
+                 <label>请输入正常工作时的环境温度</label><input value='27' type="text" style='float:right;padding:5px;width:160px;border:none;background:#F8F8F8;'>
+               </p>
+                <p>
+                 <label>请输入与参考图像的最大温差</label><input value='20' type="text" style='float:right;padding:5px;width:160px;border:none;background:#F8F8F8;'>
+               </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="system = false">取 消</el-button>
+        <el-button type="primary" @click="system = false">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      :visible.sync="danger"
+      width="645px"
+      >
+      <div class='system-body'>
+        <p class='dialog-title'>警告</p>
+        <div class='dialog-content'>
+          <div style='flex:1;display:flex;'>
+            <div style='padding-top:40px'>
+              <img src="../assets/dange.png" alt="">
+            </div>
+            <div style='flex:1;margin-left:40px;display:flex;flex-direction: column;justify-content: space-between;'>
+              <p>监测点</p>
+              <p>报警原因</p>
+              <p>报警依据</p>
+              <p>监测点正常工作最高温度阙值</p>
+              <p>监测点当前温度</p>
+              <p>超过报警温度阙值</p>
+              <p>建议采取的措施</p>
+            </div>
+          </div>
+          <div style='flex:1'>
+            <div style='flex:1;margin-left:40px;display:flex;flex-direction: column;justify-content: space-between;height:100%;'>
+              <p>C(套管）存在一般热缺陷</p>
+              <p>监测点温度超过正常工作的最高温度</p>
+              <p>绝对温度判断法</p>
+              <p>53.3°C(2017.5.18-19:43:15)</p>
+              <p>52.2ºC</p>
+              <p>3.3ºC</p>
+              <p>应引起注意，寻找机会处理</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="danger = false">取 消</el-button>
+        <el-button type="primary" @click="danger = false">确 定</el-button>
+      </span>
+    </el-dialog>
+    <el-dialog
+      :visible.sync="monitor"
+      width="645px"
+      >
+      <div class='system-body'>
+        <p class='dialog-title'>监测方式设置</p>
+        <div class='dialog-content' style='flex-direction: column;justify-content: space-around;'>
+          <el-checkbox v-model="checked">定时监测</el-checkbox><br/>
+          <div style='flex:1;height:86px;background:#fff;line-height:86px;padding-left:25px;' class='wrapper'>
+            <label>监测周期</label>
+            <el-select v-model="selectValue2" placeholder="请选择" style='border:none;padding:0;margin-left:20px;'>
+              <el-option label="1小时" value="1小时"></el-option>
+              <el-option label="2小时" value="2小时"></el-option>
+              <el-option label="3小时" value="3小时"></el-option>
+            </el-select>
+          </div>
+          <el-checkbox v-model="checked2" style='margin-top:20px;'>整点监测</el-checkbox><br/>
+          <div style='flex:2;height:86px;background:#fff;display:flex;flex-wrap: wrap;'>
+            <el-checkbox style='flex:1 1 16.6%;margin-left:30px;' v-model="checked4[item]" v-for='item in 24' :key='item'>{{item}}点</el-checkbox>
+          </div>
+        </div>
+      </div>
+      <span slot="footer" class="dialog-footer">
+        <el-button @click="monitor = false">取 消</el-button>
+        <el-button type="primary" @click="monitor = false">确 定</el-button>
+      </span>
+    </el-dialog>
   </div>
 </template>
 
@@ -113,6 +270,15 @@ export default {
   name: 'Home',
   data () {
     return {
+      checked: false,
+      checked2: false,
+      checked4: [],
+      monitor: false,
+      selectValue: '1分钟',
+      selectValue2: '1小时',
+      current: 0,
+      danger: false,
+      system: false,
       tableData: [
         {
           name: '变压器箱体 (A)',
@@ -132,7 +298,31 @@ export default {
           max: '43.8℃',
           ave: '36.1℃'
         }
-      ]
+      ],
+      data: [{
+          label: '在线监测',
+          id:1,
+          children: [{
+            label: '图像设置'
+          },
+          {
+            label: '网络设置'
+          },
+          {
+            label: '报警设置'
+          }]
+        }, {
+          label: '数据分析',
+          children: [{
+            label: '数据1'
+          }, {
+            label: '数据2'
+          }]
+        }],
+        defaultProps: {
+          children: 'children',
+          label: 'label'
+        }
     }
   }
 }
@@ -141,6 +331,67 @@ export default {
 <style scoped lang='less'>
 .HomePage{
   height: 100%;
+  .system-body{
+    // border:1px solid red;
+    height:450px;
+    margin:-50px -20px -10px -20px;
+    background:#F2F2F2;
+    .dialog-title{
+      height:50px;
+      line-height: 50px;
+      background:#fff;
+      text-align:center;
+      font-size:16px;
+      font-weight: bold;
+      border-bottom:1px solid #dadada;
+    }
+    .dialog-content{
+      padding:20px 40px;
+      height:calc(~'100% - 50px');
+      display: flex;
+      .active{
+        background:#C8997F!important;
+        color:#fff;
+      }
+      .tree-menu{
+        height:100%;
+        width:169px;
+        border:1px solid #dadada;
+        background:#fff;
+        border-radius: 5px;
+      }
+      .dialog-setting{
+        margin-left:12px;
+        flex:1;
+        // border:1px solid red;
+        .btn-group{
+          margin-top:15px;
+          span{
+            cursor: pointer;
+            padding:10px 20px;
+            background:#fff;
+            margin-right:10px;
+            border-radius: 5px;
+            border:1px solid #DADADA;
+            &:hover{
+              background:#C8997F;
+              color:#fff;
+            }
+          }
+        }
+        .input-group{
+          margin-top:15px;
+          border:1px solid #DADADA;
+          background:#fff;
+          height:120px;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-around;
+          padding:0 10px;
+        }
+      }
+    }
+  }
   .title{
     text-align: center;
     margin-top:16px;
@@ -148,23 +399,36 @@ export default {
   .list{
     overflow: hidden;
     padding:15px 30px;
-    span{
+    &>span{
       float: left;
-      margin-right:32px;
+      // margin-right:32px;
+      padding:8px 14px;
       cursor: pointer;
+      border:1px solid #d0d0d0;
+      border-left:none;
+      &:hover{
+        background:#aaa;
+        color:#fff!important;
+      }
+    }
+     &>span:nth-child(1){
+      border-left:1px solid #d0d0d0;
     }
   }
   .banner{
     height: 150px;
     line-height: 150px;
-    background:#bfbfbf;
+    // background:#bfbfbf;
     text-align:center;
     font-size: 40px;
+    font-weight: blod;
+    color:#fff;
+    background: url('../assets/bg.png') no-repeat center;
   }
   .main{
     overflow: hidden;
     margin-top:50px;
-    margin-bottom:50px;
+    margin-bottom:20px;
     .form{
       background:#f3f3f3;
       height:260px;
@@ -216,7 +480,7 @@ export default {
         cursor: pointer;
         .item-right{
           float: right;
-          width:80px;
+          width:90px;
           // border:1px solid red;
           right: 0;
           top:0;
@@ -237,7 +501,7 @@ export default {
     }
     .right{
       // border:1px solid blue;
-      height:690px;
+      height:720px;
       float: right;
       width:830px;
       .img-wrapper{
@@ -280,6 +544,7 @@ export default {
       .form-wrapper{
         // border:1px solid red;
         position: relative;
+        margin-top:15px;
         .form-td{
           position: absolute;
           top:0;

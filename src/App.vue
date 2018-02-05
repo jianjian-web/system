@@ -35,4 +35,11 @@ p{
   padding:0;
   margin:0;
 }
+.el-select .el-input__inner{
+  background: transparent;
+  border:none;
+}
+.wrapper .el-input__inner{
+  background:#F8F8F8;
+}
 </style>
