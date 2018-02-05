@@ -157,13 +157,13 @@
             <p>报警温度设置</p>
             <p class='btn-group'>
               <span :class='{active: current === 0}' @click='current = 0'>
-                A (变压器箱体) 
+                A (变压器箱体)
               </span>
               <span :class='{active: current === 1}' @click='current = 1'>
-                B (油枕) 
+                B (油枕)
               </span>
               <span :class='{active: current === 2}' @click='current = 2'>
-                C (套管) 
+                C (套管)
               </span>
             </p>
             <div class='input-group'>
@@ -300,29 +300,29 @@ export default {
         }
       ],
       data: [{
-          label: '在线监测',
-          id:1,
-          children: [{
-            label: '图像设置'
-          },
-          {
-            label: '网络设置'
-          },
-          {
-            label: '报警设置'
-          }]
+        label: '在线监测',
+        id: 1,
+        children: [{
+          label: '图像设置'
+        },
+        {
+          label: '网络设置'
+        },
+        {
+          label: '报警设置'
+        }]
+      }, {
+        label: '数据分析',
+        children: [{
+          label: '数据1'
         }, {
-          label: '数据分析',
-          children: [{
-            label: '数据1'
-          }, {
-            label: '数据2'
-          }]
-        }],
-        defaultProps: {
-          children: 'children',
-          label: 'label'
-        }
+          label: '数据2'
+        }]
+      }],
+      defaultProps: {
+        children: 'children',
+        label: 'label'
+      }
     }
   }
 }
